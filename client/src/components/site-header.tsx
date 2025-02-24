@@ -6,6 +6,7 @@ import {
   LogIn,
   LogOut,
   Shield,
+  List,
 } from "lucide-react";
 
 export function SiteHeader() {
@@ -24,6 +25,11 @@ export function SiteHeader() {
               <Link href="/repository" className="text-sm font-medium transition-colors hover:text-primary">
                 Repository
               </Link>
+              {user?.isAdmin && (
+                <Link href="/admin/topics" className="text-sm font-medium transition-colors hover:text-primary">
+                  Manage Topics
+                </Link>
+              )}
             </nav>
           </div>
           <div className="flex items-center space-x-4">

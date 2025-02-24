@@ -7,6 +7,7 @@ import Landing from "@/pages/landing";
 import Repository from "@/pages/repository";
 import Issue from "@/pages/issue";
 import Login from "@/pages/admin/login";
+import TopicsAdmin from "@/pages/admin/topics";
 import { SiteHeader } from "@/components/site-header";
 
 function Router() {
@@ -18,6 +19,7 @@ function Router() {
         <Route path="/repository" component={Repository} />
         <Route path="/issue/:id" component={Issue} />
         <Route path="/admin/login" component={Login} />
+        <Route path="/admin/topics" component={TopicsAdmin} />
         <Route component={NotFound} />
       </Switch>
     </div>
