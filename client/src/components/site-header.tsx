@@ -16,17 +16,13 @@ export function SiteHeader() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Link href="/">
-              <a className="flex items-center space-x-2">
-                <BookOpen className="h-6 w-6" />
-                <span className="font-bold text-xl">KnowledgeBase</span>
-              </a>
+            <Link href="/" className="flex items-center space-x-2">
+              <BookOpen className="h-6 w-6" />
+              <span className="font-bold text-xl">KnowledgeBase</span>
             </Link>
             <nav className="flex items-center space-x-4">
-              <Link href="/repository">
-                <a className="text-sm font-medium transition-colors hover:text-primary">
-                  Repository
-                </a>
+              <Link href="/repository" className="text-sm font-medium transition-colors hover:text-primary">
+                Repository
               </Link>
             </nav>
           </div>

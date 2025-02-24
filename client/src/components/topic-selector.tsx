@@ -10,7 +10,7 @@ import { Topic } from "@shared/schema";
 
 interface TopicSelectorProps {
   value?: number;
-  onSelect: (topicId: number) => void;
+  onSelect: (topicId: number | undefined) => void;
 }
 
 export function TopicSelector({ value, onSelect }: TopicSelectorProps) {
@@ -21,13 +21,14 @@ export function TopicSelector({ value, onSelect }: TopicSelectorProps) {
   return (
     <Select
       value={value?.toString()}
-      onValueChange={(value) => onSelect(Number(value))}
+      onValueChange={(value) => onSelect(value === "all" ? undefined : Number(value))}
       disabled={isLoading}
     >
       <SelectTrigger>
         <SelectValue placeholder="Select a topic" />
       </SelectTrigger>
       <SelectContent>
+        <SelectItem value="all">All Topics</SelectItem>
         {topics?.map((topic) => (
           <SelectItem key={topic.id} value={topic.id.toString()}>
             {topic.name}
