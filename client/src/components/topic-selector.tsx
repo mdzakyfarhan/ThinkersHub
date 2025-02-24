@@ -16,6 +16,7 @@ interface TopicSelectorProps {
 export function TopicSelector({ value, onSelect }: TopicSelectorProps) {
   const { data: topics, isLoading } = useQuery<Topic[]>({
     queryKey: ["/api/topics"],
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 
   return (
