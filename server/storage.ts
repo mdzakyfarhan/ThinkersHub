@@ -44,8 +44,17 @@ export class MemStorage implements IStorage {
     this.createUser({
       username: "admin",
       password: "admin123",
-      isAdmin: true,
+      isAdmin: true
     } as InsertUser);
+
+    // Create default topics focused on Indonesia
+    [
+      { name: "Politics & Governance", description: "Political issues and governance challenges in Indonesia" },
+      { name: "Economic Development", description: "Economic challenges and opportunities in Indonesian market" },
+      { name: "Environmental Sustainability", description: "Environmental issues and conservation in Indonesian archipelago" },
+      { name: "Social Development", description: "Social issues and community development across Indonesian regions" },
+      { name: "Technology & Innovation", description: "Digital transformation and tech adoption in Indonesia" }
+    ].forEach(topic => this.createTopic(topic));
   }
 
   // Users

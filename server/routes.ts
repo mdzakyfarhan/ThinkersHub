@@ -56,15 +56,26 @@ export async function registerRoutes(app: Express) {
   });
 
   // Topics
-  app.get("/api/topics", async (req, res) => {
-    const topics = await storage.getTopics();
-    res.json(topics);
+  app.get("/api/topics", async (_req, res) => {
+    try {
+      const topics = await storage.getTopics();
+      console.log("Fetched topics:", topics); // Add logging
+      res.json(topics);
+    } catch (error) {
+      console.error("Error fetching topics:", error);
+      res.status(500).json({ message: "Failed to fetch topics" });
+    }
   });
 
   app.post("/api/topics", async (req, res) => {
-    const topic = insertTopicSchema.parse(req.body);
-    const newTopic = await storage.createTopic(topic);
-    res.json(newTopic);
+    try {
+      const topic = insertTopicSchema.parse(req.body);
+      const newTopic = await storage.createTopic(topic);
+      res.json(newTopic);
+    } catch (error) {
+      console.error("Error creating topic:", error);
+      res.status(500).json({ message: "Failed to create topic" });
+    }
   });
 
   // Issues
