@@ -1,0 +1,105 @@
+I want to make a simple 2-page website, which consist of landing page and main functionality page
+The purpose of the website is to provide dynamic & LLM supported topic based repository, identifying main issue based on topic (politic, economy, social, environment, technology, etc.) in a certain country, taking input from recent and curated news, research papers, and articles (needs to be accepted or reviewed by admin or website owner), then collecting those issues in a table of content listing the issue description and connecting it to available proposed or available solutions that's taken from reliable source like research paper, scientific/factual article, etc. (with link to all sources cited)
+The point of the website is to make list of issue in a country and connecting it to available solutions.
+It is better to also be able to choose/input certain issue, then let the website do the thinking and processing to provide the table of issue vs. solution for that certain issue.
+It is better if we can add third page for when a certain issue is clicked, to see the more detailed explainer of the issue first and the breakdown of its description, cause, effect, key facts & numbers, then going to the solution list.
+Here are the outline for key components and requirements :
+1.	Core Pages & Features:
+Landing Page:
+•	Introduction/purpose statement
+•	Topic selection interface (politics, economy, etc.)
+•	Search/filter functionality
+•	Quick statistics or highlights of key issues
+•	User authentication (for admins)
+Main Repository Page:
+•	Dynamic table of contents for issues
+•	Filtering/sorting capabilities
+•	Issue cards/entries with brief descriptions
+•	Links to detailed pages
+•	Source citations display
+Detailed Issue Page:
+•	Comprehensive issue breakdown
+•	Problem statement
+•	Root cause analysis
+•	Impact assessment
+•	Key statistics and facts
+•	Related solutions with source links
+•	Citation management
+2.	Technical Requirements:
+Backend:
+•	Database to store: 
+o	Issues
+o	Solutions
+o	Sources/citations
+o	Topic categories
+o	User/admin data
+•	API integration capabilities for: 
+o	LLM processing
+o	Source verification
+o	Content management
+•	Authentication system
+•	Content moderation tools
+Frontend:
+•	Responsive design
+•	Interactive UI components
+•	Search functionality
+•	Filtering system
+•	Content presentation framework
+3.	Functional Requirements:
+Admin Features:
+•	Content management system
+•	Source verification interface
+•	User management
+•	Content approval workflow
+•	Analytics dashboard
+User Features:
+•	Topic browsing
+•	Issue search
+•	Content filtering
+•	Source access
+•	Issue-solution matching requests
+4.	Integration Requirements:
+•	LLM API integration for: 
+o	Content analysis
+o	Issue-solution matching
+o	Content summarization
+•	Database integration
+•	Source verification system
+•	Citation management system
+5.	Infrastructure Requirements:
+•	Secure hosting
+•	Database server
+•	Content delivery network (CDN)
+•	SSL certification
+•	Regular backup system
+•	Analytics tracking
+6.	Optional Features to Consider:
+•	User feedback system
+•	Issue rating/voting
+•	Solution effectiveness tracking
+•	Expert contribution portal
+•	Newsletter integration
+•	Social sharing capabilities
+•	API access for researchers
+7.	Development Considerations:
+•	Scalability planning
+•	Mobile responsiveness
+•	Performance optimization
+•	Security measures
+•	Content moderation workflow
+•	Data backup strategy
+8.	Recommended Technology Stack:
+For a robust and scalable solution, consider:
+Frontend:
+•	React.js or Next.js
+•	Tailwind CSS or Material UI
+•	Redux for state management
+Backend:
+•	Node.js/Express or Python/Django
+•	PostgreSQL or MongoDB
+•	Redis for caching
+APIs:
+•	OpenAI/Claude API for LLM integration
+•	Authentication service
+•	Search engine integration
+
