@@ -145,16 +145,27 @@ export async function registerRoutes(app: Express) {
     try {
       const id = Number(req.params.id);
       if (isNaN(id)) {
-        return res.status(400).json({ message: "Invalid solution ID" });
+        return res.status(400).json({ success: false, message: "Invalid solution ID" });
       }
+      
+      // First check if solution exists
+      const solution = await storage.getSolutions(id);
+      if (!solution || solution.length === 0) {
+        return res.status(404).json({ success: false, message: `Solution ${id} not found` });
+      }
+
       const result = await storage.deleteSolution(id);
       if (!result.success) {
-        return res.status(404).json({ message: result.message });
+        return res.status(400).json({ success: false, message: result.message });
       }
-      res.json({ success: true });
+      
+      res.json({ success: true, message: "Solution deleted successfully" });
     } catch (error: any) {
       console.error("Delete error:", error);
-      res.status(500).json({ message: error.message || "Failed to delete solution" });
+      res.status(500).json({ 
+        success: false, 
+        message: error.message || "Internal server error during solution deletion"
+      });
     }
   });
 
