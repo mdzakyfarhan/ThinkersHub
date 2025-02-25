@@ -138,7 +138,11 @@ export class MemStorage implements IStorage {
   async approveSolution(id: number): Promise<Solution> {
     const solution = this.solutions.get(id);
     if (!solution) throw new Error("Solution not found");
-    const updatedSolution = { ...solution, approved: true, rejected: false };
+    const updatedSolution = { 
+      ...solution, 
+      approved: true,
+      rejected: false // Clear rejected status when approving
+    };
     this.solutions.set(id, updatedSolution);
     return updatedSolution;
   }
@@ -146,13 +150,18 @@ export class MemStorage implements IStorage {
   async rejectSolution(id: number): Promise<Solution> {
     const solution = this.solutions.get(id);
     if (!solution) throw new Error("Solution not found");
-    const updatedSolution = { ...solution, approved: false, rejected: true };
+    const updatedSolution = { 
+      ...solution, 
+      approved: false, // Remove approval when rejecting
+      rejected: true 
+    };
     this.solutions.set(id, updatedSolution);
     return updatedSolution;
   }
 
   async deleteSolution(id: number): Promise<void> {
-    if (!this.solutions.has(id)) throw new Error("Solution not found");
+    const solution = this.solutions.get(id);
+    if (!solution) throw new Error("Solution not found");
     this.solutions.delete(id);
   }
 }

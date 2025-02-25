@@ -119,18 +119,30 @@ export async function registerRoutes(app: Express) {
   });
 
   app.post("/api/solutions/:id/approve", async (req, res) => {
-    const solution = await storage.approveSolution(Number(req.params.id));
-    res.json(solution);
+    try {
+      const solution = await storage.approveSolution(Number(req.params.id));
+      res.json(solution);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to approve solution" });
+    }
   });
 
   app.post("/api/solutions/:id/reject", async (req, res) => {
-    const solution = await storage.rejectSolution(Number(req.params.id));
-    res.json(solution);
+    try {
+      const solution = await storage.rejectSolution(Number(req.params.id));
+      res.json(solution);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to reject solution" });
+    }
   });
 
   app.delete("/api/solutions/:id", async (req, res) => {
-    await storage.deleteSolution(Number(req.params.id));
-    res.json({ success: true });
+    try {
+      await storage.deleteSolution(Number(req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete solution" });
+    }
   });
 
   // AI matching

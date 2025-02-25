@@ -69,7 +69,12 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
     }
   };
 
-  // Don't render rejected or unapproved solutions unless user is admin
+  // Don't show rejected solutions unless user is admin
+  if (solution.rejected && !user?.isAdmin) {
+    return null;
+  }
+  
+  // Don't show unapproved solutions unless user is admin
   if (!solution.approved && !user?.isAdmin) {
     return null;
   }
