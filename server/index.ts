@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import * as storage from './storage'; // Assuming storage.ts is where the seeding function resides
 
 const app = express();
 app.use(express.json());
@@ -38,6 +39,15 @@ app.use((req, res, next) => {
 
 (async () => {
   const server = await registerRoutes(app);
+
+  // Seed sample data
+  try {
+    await storage.seedSampleData();
+    console.log('Sample data seeded successfully');
+  } catch (error) {
+    console.log('Sample data seeding failed:', error); // More informative error logging
+  }
+
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
