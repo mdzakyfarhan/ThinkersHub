@@ -2,11 +2,17 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "wouter";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SourceCitation } from "@/components/source-citation";
+import { Button } from "@/components/ui/button";
 import { Issue, Solution } from "@shared/schema";
+import { SolutionCard } from "@/components/solution-card";
+import { PlusCircle } from "lucide-react";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { CreateSolutionForm } from "@/components/create-solution-form";
 
 export default function IssuePage() {
   const { id } = useParams();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { data: issue, isLoading: isLoadingIssue } = useQuery<Issue>({
     queryKey: [`/api/issues/${id}`],
@@ -58,16 +64,41 @@ export default function IssuePage() {
         </Card>
 
         <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">Proposed Solutions</h2>
-          {solutions?.map((solution) => (
-            <Card key={solution.id}>
-              <CardContent className="pt-6">
-                <h3 className="text-lg font-semibold mb-2">{solution.title}</h3>
-                <p className="mb-4">{solution.content}</p>
-                <SourceCitation source={solution.source} />
-              </CardContent>
-            </Card>
-          ))}
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-semibold">Proposed Solutions</h2>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Add Solution
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add New Solution</DialogTitle>
+                </DialogHeader>
+                <CreateSolutionForm 
+                  issueId={Number(id)} 
+                  onSuccess={() => setIsDialogOpen(false)} 
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          <div className="space-y-4">
+            {solutions?.map((solution) => (
+              <SolutionCard 
+                key={solution.id} 
+                solution={solution} 
+                issueId={Number(id)}
+              />
+            ))}
+            {solutions?.length === 0 && (
+              <p className="text-center text-muted-foreground py-8">
+                No solutions have been proposed yet. Be the first to add a solution!
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>
