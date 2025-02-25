@@ -130,27 +130,34 @@ export class MemStorage implements IStorage {
 
   async createSolution(solution: InsertSolution): Promise<Solution> {
     const id = this.currentIds.solutions++;
-    const newSolution = { ...solution, id, approved: false };
+    const newSolution = { 
+      ...solution, 
+      id, 
+      approved: false,
+      rejected: false 
+    };
     this.solutions.set(id, newSolution);
+    console.log("Created solution:", newSolution);
     return newSolution;
   }
 
   async approveSolution(id: number): Promise<Solution> {
     const solution = this.solutions.get(id);
-    if (!solution) throw new Error("Solution not found");
+    if (!solution) throw new Error(`Solution ${id} not found`);
     const updatedSolution = { 
       ...solution, 
       approved: true,
-      rejected: false // Clear rejected status when approving
+      rejected: false
     };
     this.solutions.set(id, updatedSolution);
+    console.log("Approved solution:", updatedSolution);
     return updatedSolution;
   }
 
   async rejectSolution(id: number): Promise<Solution> {
     const solution = this.solutions.get(id);
     if (!solution) {
-      throw new Error("Solution not found");
+      throw new Error(`Solution ${id} not found`);
     }
     const updatedSolution = { 
       ...solution, 
@@ -158,20 +165,27 @@ export class MemStorage implements IStorage {
       rejected: true 
     };
     this.solutions.set(id, updatedSolution);
+    console.log("Rejected solution:", updatedSolution);
     return updatedSolution;
   }
 
   async deleteSolution(id: number): Promise<{ success: boolean; message?: string }> {
-    const solution = this.solutions.get(id);
-    if (!solution) {
-      return { success: false, message: "Solution not found" };
+    if (!this.solutions.has(id)) {
+      console.log(`Solution ${id} not found for deletion`);
+      return { success: false, message: `Solution ${id} not found` };
     }
+    
     try {
-      this.solutions.delete(id);
+      const deleted = this.solutions.delete(id);
+      console.log(`Solution ${id} deletion result:`, deleted);
+      if (!deleted) {
+        throw new Error(`Failed to delete solution ${id}`);
+      }
       return { success: true };
-    } catch (error) {
-      console.error("Delete error:", error);
-      return { success: false, message: "Failed to delete solution from storage" };
+    } catch (error: any) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error(`Delete error for solution ${id}:`, errorMessage);
+      return { success: false, message: errorMessage };
     }
   }
 }
