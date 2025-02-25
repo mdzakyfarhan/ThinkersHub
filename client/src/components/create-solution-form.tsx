@@ -1,3 +1,4 @@
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertSolutionSchema } from "@shared/schema";
@@ -36,6 +37,7 @@ export function CreateSolutionForm({ issueId, onSuccess }: CreateSolutionFormPro
         description: "Your solution has been submitted successfully.",
       });
       queryClient.invalidateQueries({ queryKey: [`/api/issues/${issueId}/solutions`] });
+      form.reset();
       onSuccess?.();
     } catch (error) {
       toast({
