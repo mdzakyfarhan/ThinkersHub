@@ -132,12 +132,8 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
             </Button>
           )}
           <Button onClick={() => setShowDeleteDialog(true)} size="sm" variant="outline" className="text-red-600">
-            <Trash2 className="h-4 w-4 mr-1" />
+            <Trash2 className="h-4 w-4 mr-2" />
             Delete
-          </Button>
-            <Button onClick={() => setShowDeleteDialog(true)} size="sm" variant="outline" className="text-red-600">
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete
             </Button>
           </CardFooter>
         )}

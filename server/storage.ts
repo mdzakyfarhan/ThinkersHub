@@ -162,7 +162,8 @@ export class MemStorage implements IStorage {
   async deleteSolution(id: number): Promise<void> {
     const solution = this.solutions.get(id);
     if (!solution) throw new Error("Solution not found");
-    this.solutions.delete(id);
+    const deleted = this.solutions.delete(id);
+    if (!deleted) throw new Error("Failed to delete solution");
   }
 }
 
