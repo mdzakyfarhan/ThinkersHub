@@ -147,18 +147,18 @@ export class MemStorage implements IStorage {
 export const storage = new MemStorage();
 export async function seedSampleData() {
   // Add sample topics
-  const webDevTopic = await createTopic({
+  const webDevTopic = await storage.createTopic({
     name: "Web Development",
     description: "Issues and solutions related to web development"
   });
 
-  const aiTopic = await createTopic({
+  const aiTopic = await storage.createTopic({
     name: "AI & Machine Learning",
     description: "Problems and solutions in AI/ML implementations"
   });
 
   // Add sample issues
-  await createIssue({
+  await storage.createIssue({
     title: "React Component Re-rendering Issue",
     content: "My React components are re-rendering too frequently, causing performance issues. I've noticed this especially in a large list component with multiple state updates.",
     topicId: webDevTopic.id,
@@ -169,7 +169,7 @@ export async function seedSampleData() {
     ]
   });
 
-  await createIssue({
+  await storage.createIssue({
     title: "GPT API Token Usage Optimization",
     content: "Our application is consuming too many tokens in GPT API calls. We need to optimize the prompts and response handling to reduce costs while maintaining quality.",
     topicId: aiTopic.id,
