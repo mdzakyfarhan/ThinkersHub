@@ -52,38 +52,48 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
 
   const handleReject = async () => {
     try {
-      await apiRequest("POST", `/api/solutions/${solution.id}/reject`);
+      const response = await apiRequest("POST", `/api/solutions/${solution.id}/reject`);
+      if (!response) {
+        throw new Error("Failed to reject solution");
+      }
       toast({
         title: "Solution rejected",
-        description: "The solution has been rejected.",
+        description: "The solution has been rejected successfully.",
       });
-      queryClient.invalidateQueries({ queryKey: [`/api/issues/${issueId}/solutions`] });
+      await queryClient.invalidateQueries({ queryKey: [`/api/issues/${issueId}/solutions`] });
     } catch (error) {
+      console.error("Reject error:", error);
       toast({
         title: "Error",
-        description: "Failed to reject solution.",
+        description: "Failed to reject solution. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setShowRejectDialog(false);
     }
-    setShowRejectDialog(false);
   };
 
   const handleDelete = async () => {
     try {
-      await apiRequest("DELETE", `/api/solutions/${solution.id}`);
+      const response = await apiRequest("DELETE", `/api/solutions/${solution.id}`);
+      if (!response.success) {
+        throw new Error("Failed to delete solution");
+      }
       toast({
         title: "Solution deleted",
-        description: "The solution has been deleted.",
+        description: "The solution has been deleted successfully.",
       });
-      queryClient.invalidateQueries({ queryKey: [`/api/issues/${issueId}/solutions`] });
+      await queryClient.invalidateQueries({ queryKey: [`/api/issues/${issueId}/solutions`] });
     } catch (error) {
+      console.error("Delete error:", error);
       toast({
         title: "Error",
-        description: "Failed to delete solution.",
+        description: "Failed to delete solution. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setShowDeleteDialog(false);
     }
-    setShowDeleteDialog(false);
   };
 
   // Only show approved solutions to non-admin users
