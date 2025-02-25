@@ -136,11 +136,11 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
                 Approve
               </Button>
             )}
-            {!solution.rejected && solution.approved && (
-            <Button onClick={() => setShowRejectDialog(true)} size="sm" variant="outline" className="text-red-600">
-              Reject
-            </Button>
-          )}
+            {!solution.rejected && (
+              <Button onClick={() => setShowRejectDialog(true)} size="sm" variant="outline" className="text-red-600">
+                Reject
+              </Button>
+            )}
           <Button onClick={() => setShowDeleteDialog(true)} size="sm" variant="outline" className="text-red-600">
             <Trash2 className="h-4 w-4 mr-2" />
             Delete
