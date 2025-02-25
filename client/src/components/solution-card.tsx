@@ -53,19 +53,20 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
   const handleReject = async () => {
     try {
       const response = await apiRequest("POST", `/api/solutions/${solution.id}/reject`);
-      if (!response) {
-        throw new Error("Failed to reject solution");
+      if (!response || response.error) {
+        throw new Error(response?.error || "Failed to reject solution");
       }
       toast({
         title: "Solution rejected",
         description: "The solution has been rejected successfully.",
       });
       await queryClient.invalidateQueries({ queryKey: [`/api/issues/${issueId}/solutions`] });
-    } catch (error) {
+      await queryClient.refetchQueries({ queryKey: [`/api/issues/${issueId}/solutions`] });
+    } catch (error: any) {
       console.error("Reject error:", error);
       toast({
         title: "Error",
-        description: "Failed to reject solution. Please try again.",
+        description: error.message || "Failed to reject solution. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -76,19 +77,20 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
   const handleDelete = async () => {
     try {
       const response = await apiRequest("DELETE", `/api/solutions/${solution.id}`);
-      if (!response.success) {
-        throw new Error("Failed to delete solution");
+      if (!response || !response.success) {
+        throw new Error(response?.message || "Failed to delete solution");
       }
       toast({
         title: "Solution deleted",
         description: "The solution has been deleted successfully.",
       });
       await queryClient.invalidateQueries({ queryKey: [`/api/issues/${issueId}/solutions`] });
-    } catch (error) {
+      await queryClient.refetchQueries({ queryKey: [`/api/issues/${issueId}/solutions`] });
+    } catch (error: any) {
       console.error("Delete error:", error);
       toast({
         title: "Error",
-        description: "Failed to delete solution. Please try again.",
+        description: error.message || "Failed to delete solution. Please try again.",
         variant: "destructive",
       });
     } finally {
