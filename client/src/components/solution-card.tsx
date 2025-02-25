@@ -69,13 +69,8 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
     }
   };
 
-  // Don't show rejected solutions unless user is admin
-  if (solution.rejected && !user?.isAdmin) {
-    return null;
-  }
-  
-  // Don't show unapproved solutions unless user is admin
-  if (!solution.approved && !user?.isAdmin) {
+  // Only show approved solutions to non-admin users
+  if (!user?.isAdmin && (!solution.approved || solution.rejected)) {
     return null;
   }
 
@@ -106,7 +101,7 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
       </CardContent>
       {user?.isAdmin && (
         <CardFooter className="flex gap-2 justify-end">
-          {!solution.approved && (
+          {!solution.approved && !solution.rejected && (
             <Button onClick={handleApprove} size="sm" variant="outline" className="text-green-600">
               Approve
             </Button>
@@ -118,6 +113,7 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
           )}
           <Button onClick={handleDelete} size="sm" variant="outline" className="text-red-600">
             <Trash2 className="h-4 w-4" />
+            Delete
           </Button>
         </CardFooter>
       )}
