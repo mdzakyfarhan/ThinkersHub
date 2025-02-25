@@ -33,6 +33,7 @@ export const solutions = pgTable("solutions", {
   source: text("source").notNull(),
   issueId: serial("issue_id").references(() => issues.id),
   approved: boolean("approved").notNull().default(false),
+  rejected: boolean("rejected").notNull().default(false),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -48,7 +49,8 @@ export const insertIssueSchema = createInsertSchema(issues).omit({
 });
 export const insertSolutionSchema = createInsertSchema(solutions).omit({ 
   id: true,
-  approved: true 
+  approved: true,
+  rejected: true
 });
 
 export type User = typeof users.$inferSelect;

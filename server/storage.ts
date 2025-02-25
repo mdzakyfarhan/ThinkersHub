@@ -138,9 +138,22 @@ export class MemStorage implements IStorage {
   async approveSolution(id: number): Promise<Solution> {
     const solution = this.solutions.get(id);
     if (!solution) throw new Error("Solution not found");
-    const updatedSolution = { ...solution, approved: true };
+    const updatedSolution = { ...solution, approved: true, rejected: false };
     this.solutions.set(id, updatedSolution);
     return updatedSolution;
+  }
+
+  async rejectSolution(id: number): Promise<Solution> {
+    const solution = this.solutions.get(id);
+    if (!solution) throw new Error("Solution not found");
+    const updatedSolution = { ...solution, approved: false, rejected: true };
+    this.solutions.set(id, updatedSolution);
+    return updatedSolution;
+  }
+
+  async deleteSolution(id: number): Promise<void> {
+    if (!this.solutions.has(id)) throw new Error("Solution not found");
+    this.solutions.delete(id);
   }
 }
 

@@ -123,6 +123,16 @@ export async function registerRoutes(app: Express) {
     res.json(solution);
   });
 
+  app.post("/api/solutions/:id/reject", async (req, res) => {
+    const solution = await storage.rejectSolution(Number(req.params.id));
+    res.json(solution);
+  });
+
+  app.delete("/api/solutions/:id", async (req, res) => {
+    await storage.deleteSolution(Number(req.params.id));
+    res.json({ success: true });
+  });
+
   // AI matching
   app.post("/api/match-solutions", async (req, res) => {
     const { description } = req.body;

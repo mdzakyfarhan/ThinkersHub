@@ -1,7 +1,8 @@
+
 import { Solution } from "@shared/schema";
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, Trash2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -34,6 +35,45 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
     }
   };
 
+  const handleReject = async () => {
+    try {
+      await apiRequest("POST", `/api/solutions/${solution.id}/reject`);
+      toast({
+        title: "Solution rejected",
+        description: "The solution has been rejected.",
+      });
+      queryClient.invalidateQueries({ queryKey: [`/api/issues/${issueId}/solutions`] });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to reject solution.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await apiRequest("DELETE", `/api/solutions/${solution.id}`);
+      toast({
+        title: "Solution deleted",
+        description: "The solution has been deleted.",
+      });
+      queryClient.invalidateQueries({ queryKey: [`/api/issues/${issueId}/solutions`] });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete solution.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Don't render rejected or unapproved solutions unless user is admin
+  if (!solution.approved && !user?.isAdmin) {
+    return null;
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -45,6 +85,12 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
               <span className="text-sm">Approved</span>
             </div>
           )}
+          {solution.rejected && (
+            <div className="flex items-center text-red-600">
+              <XCircle className="h-5 w-5 mr-1" />
+              <span className="text-sm">Rejected</span>
+            </div>
+          )}
         </div>
       </CardHeader>
       <CardContent>
@@ -53,10 +99,20 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
           <span>Source: {solution.source}</span>
         </div>
       </CardContent>
-      {user?.isAdmin && !solution.approved && (
-        <CardFooter>
-          <Button onClick={handleApprove} className="ml-auto" size="sm">
-            Approve Solution
+      {user?.isAdmin && (
+        <CardFooter className="flex gap-2 justify-end">
+          {!solution.approved && (
+            <Button onClick={handleApprove} size="sm" variant="outline" className="text-green-600">
+              Approve
+            </Button>
+          )}
+          {!solution.rejected && (
+            <Button onClick={handleReject} size="sm" variant="outline" className="text-red-600">
+              Reject
+            </Button>
+          )}
+          <Button onClick={handleDelete} size="sm" variant="outline" className="text-red-600">
+            <Trash2 className="h-4 w-4" />
           </Button>
         </CardFooter>
       )}
