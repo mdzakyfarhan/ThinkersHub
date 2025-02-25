@@ -129,19 +129,32 @@ export async function registerRoutes(app: Express) {
 
   app.post("/api/solutions/:id/reject", async (req, res) => {
     try {
-      const solution = await storage.rejectSolution(Number(req.params.id));
+      const id = Number(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid solution ID" });
+      }
+      const solution = await storage.rejectSolution(id);
       res.json(solution);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to reject solution" });
+    } catch (error: any) {
+      console.error("Reject error:", error);
+      res.status(500).json({ message: error.message || "Failed to reject solution" });
     }
   });
 
   app.delete("/api/solutions/:id", async (req, res) => {
     try {
-      await storage.deleteSolution(Number(req.params.id));
+      const id = Number(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid solution ID" });
+      }
+      const result = await storage.deleteSolution(id);
+      if (!result.success) {
+        return res.status(404).json({ message: result.message });
+      }
       res.json({ success: true });
-    } catch (error) {
-      res.status(500).json({ message: "Failed to delete solution" });
+    } catch (error: any) {
+      console.error("Delete error:", error);
+      res.status(500).json({ message: error.message || "Failed to delete solution" });
     }
   });
 

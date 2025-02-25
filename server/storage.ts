@@ -149,7 +149,9 @@ export class MemStorage implements IStorage {
 
   async rejectSolution(id: number): Promise<Solution> {
     const solution = this.solutions.get(id);
-    if (!solution) throw new Error("Solution not found");
+    if (!solution) {
+      throw new Error("Solution not found");
+    }
     const updatedSolution = { 
       ...solution, 
       approved: false,
@@ -164,11 +166,13 @@ export class MemStorage implements IStorage {
     if (!solution) {
       return { success: false, message: "Solution not found" };
     }
-    const deleted = this.solutions.delete(id);
-    if (!deleted) {
-      return { success: false, message: "Failed to delete solution" };
+    try {
+      this.solutions.delete(id);
+      return { success: true };
+    } catch (error) {
+      console.error("Delete error:", error);
+      return { success: false, message: "Failed to delete solution from storage" };
     }
-    return { success: true };
   }
 }
 
