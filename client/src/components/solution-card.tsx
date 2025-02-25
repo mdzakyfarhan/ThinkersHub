@@ -97,18 +97,20 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
         <CardHeader>
           <div className="flex items-start justify-between">
             <h3 className="text-lg font-semibold">{solution.title}</h3>
-            {solution.approved && (
-              <div className="flex items-center text-green-600">
-                <CheckCircle className="h-5 w-5 mr-1" />
-                <span className="text-sm">Approved</span>
-              </div>
-            )}
-            {solution.rejected && (
-              <div className="flex items-center text-red-600">
-                <XCircle className="h-5 w-5 mr-1" />
-                <span className="text-sm">Rejected</span>
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              {solution.approved && !solution.rejected && (
+                <div className="flex items-center text-green-600">
+                  <CheckCircle className="h-5 w-5 mr-1" />
+                  <span className="text-sm">Approved</span>
+                </div>
+              )}
+              {solution.rejected && (
+                <div className="flex items-center text-red-600 bg-red-50 px-2 py-1 rounded">
+                  <XCircle className="h-5 w-5 mr-1" />
+                  <span className="text-sm font-medium">Rejected</span>
+                </div>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -124,11 +126,15 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
                 Approve
               </Button>
             )}
-            {!solution.rejected && (
-              <Button onClick={() => setShowRejectDialog(true)} size="sm" variant="outline" className="text-red-600">
-                Reject
-              </Button>
-            )}
+            {!solution.rejected && solution.approved && (
+            <Button onClick={() => setShowRejectDialog(true)} size="sm" variant="outline" className="text-red-600">
+              Reject
+            </Button>
+          )}
+          <Button onClick={() => setShowDeleteDialog(true)} size="sm" variant="outline" className="text-red-600">
+            <Trash2 className="h-4 w-4 mr-1" />
+            Delete
+          </Button>
             <Button onClick={() => setShowDeleteDialog(true)} size="sm" variant="outline" className="text-red-600">
               <Trash2 className="h-4 w-4 mr-2" />
               Delete
