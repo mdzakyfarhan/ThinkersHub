@@ -3,6 +3,10 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import * as storage from './storage'; // Assuming storage.ts is where the seeding function resides
 
+//additional import for troubleshooting
+
+
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
