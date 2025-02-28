@@ -152,23 +152,15 @@ export async function registerRoutes(app: Express) {
         return res.status(400).json({ success: false, message: "Invalid solution ID" });
       }
       
-      // First check if solution exists
-      console.log(`DELETE CHECK: Checking if solution ${id} exists`);
-      const solutions = await storage.getSolutions(id);
-      console.log(`DELETE CHECK RESULT: Solutions retrieved:`, solutions);
-      
-      if (!solutions || solutions.length === 0) {
-        console.log(`DELETE ERROR: Solution ${id} not found in getSolutions call`);
-        return res.status(404).json({ success: false, message: `Solution ${id} not found` });
-      }
-
-      console.log(`DELETE PROCEED: Solution ${id} found, proceeding with deletion`);
+      // Skip the getSolutions check and directly try to delete
+      // The deleteSolution method already checks if the solution exists
+      console.log(`DELETE PROCEED: Attempting to delete solution ${id}`);
       const result = await storage.deleteSolution(id);
       console.log(`DELETE RESULT: Deletion result:`, result);
       
       if (!result.success) {
         console.log(`DELETE ERROR: Deletion failed with message: ${result.message}`);
-        return res.status(400).json({ success: false, message: result.message });
+        return res.status(404).json({ success: false, message: result.message });
       }
       
       console.log(`DELETE SUCCESS: Solution ${id} deleted successfully`);

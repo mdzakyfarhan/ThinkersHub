@@ -134,6 +134,13 @@ export class MemStorage implements IStorage {
     return filtered;
   }
 
+  async getSolution(id: number): Promise<Solution | undefined> {
+    console.log(`GET SOLUTION: Fetching solution with id ${id}`);
+    const solution = this.solutions.get(id);
+    console.log(`GET SOLUTION RESULT:`, solution || 'Not found');
+    return solution;
+  }
+
   async createSolution(solution: InsertSolution): Promise<Solution> {
     const id = this.currentIds.solutions++;
     const newSolution = { 
@@ -176,21 +183,33 @@ export class MemStorage implements IStorage {
   }
 
   async deleteSolution(id: number): Promise<{ success: boolean; message?: string }> {
+    console.log(`DELETE SOLUTION: Checking if solution ${id} exists in Map`);
+    console.log(`DELETE SOLUTION DEBUG: All solutions:`, Array.from(this.solutions.keys()));
+    
     if (!this.solutions.has(id)) {
-      console.log(`Solution ${id} not found for deletion`);
+      console.log(`DELETE SOLUTION: Solution ${id} not found for deletion`);
       return { success: false, message: `Solution ${id} not found` };
     }
 
     try {
+      const solutionToDelete = this.solutions.get(id);
+      console.log(`DELETE SOLUTION: Found solution to delete:`, solutionToDelete);
+      
       const deleted = this.solutions.delete(id);
-      console.log(`Solution ${id} deletion result:`, deleted);
+      console.log(`DELETE SOLUTION: Map.delete() operation result:`, deleted);
+      
       if (!deleted) {
         throw new Error(`Failed to delete solution ${id}`);
       }
+      
+      // Verify deletion
+      const stillExists = this.solutions.has(id);
+      console.log(`DELETE SOLUTION: Verify deletion - solution still exists? ${stillExists}`);
+      
       return { success: true };
     } catch (error: any) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error(`Delete error for solution ${id}:`, errorMessage);
+      console.error(`DELETE SOLUTION ERROR for solution ${id}:`, errorMessage);
       return { success: false, message: errorMessage };
     }
   }
