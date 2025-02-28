@@ -36,16 +36,13 @@ export default function Login() {
 
   async function onSubmit(values: z.infer<typeof loginSchema>) {
     try {
-      console.log("Attempting login with:", values.username);
-      const result = await login(values.username, values.password);
-      console.log("Login result:", result);
+      await login(values.username, values.password);
       toast({
         title: "Login successful",
         description: "Welcome back, admin!",
       });
       navigate("/repository");
     } catch (error) {
-      console.error("Login error details:", error);
       toast({
         variant: "destructive",
         title: "Login failed",

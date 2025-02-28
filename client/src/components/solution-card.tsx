@@ -77,24 +77,13 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
   const handleDelete = async () => {
     try {
       const response = await apiRequest("DELETE", `/api/solutions/${solution.id}`);
-      
-      // If we get a 404, it means the solution is already gone, which is what we wanted
-      if (response && response.message && response.message.includes("not found")) {
-        console.log("Solution was already deleted or doesn't exist, considering this success");
-        toast({
-          title: "Solution removed",
-          description: "The solution has been removed from the list.",
-        });
-      } else if (!response || !response.success) {
+      if (!response || !response.success) {
         throw new Error(response?.message || "Failed to delete solution");
-      } else {
-        toast({
-          title: "Solution deleted",
-          description: "The solution has been deleted successfully.",
-        });
       }
-      
-      // Always refresh the solutions list
+      toast({
+        title: "Solution deleted",
+        description: "The solution has been deleted successfully.",
+      });
       await queryClient.invalidateQueries({ queryKey: [`/api/issues/${issueId}/solutions`] });
       await queryClient.refetchQueries({ queryKey: [`/api/issues/${issueId}/solutions`] });
     } catch (error: any) {

@@ -8,42 +8,19 @@ async function throwIfResNotOk(res: Response) {
 }
 
 export async function apiRequest(
-  method: "GET" | "POST" | "PUT" | "DELETE",
-  path: string,
+  method: string,
+  url: string,
   data?: unknown | undefined,
-): Promise<{ _statusCode: number } & any> {
-  try {
-    const body = data ? JSON.stringify(data) : undefined;
+): Promise<Response> {
+  const res = await fetch(url, {
+    method,
+    headers: data ? { "Content-Type": "application/json" } : {},
+    body: data ? JSON.stringify(data) : undefined,
+    credentials: "include",
+  });
 
-    const options: RequestInit = {
-      method,
-      body,
-      headers: data ? { "Content-Type": "application/json" } : {},
-      credentials: "include",
-    };
-
-    // Always ensure path starts with / for consistency
-    const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-
-    // All API requests should go to /api/* endpoint
-    const apiPath = normalizedPath.startsWith("/api") ? normalizedPath : `/api${normalizedPath}`;
-
-    console.log(`API request: ${method} ${apiPath}`);
-
-    const response = await fetch(apiPath, options);
-    console.log(`API response status: ${response.status}`);
-
-    const result = await response.json();
-    console.log("API response body:", result);
-
-    // Attach status code to the result to help with client-side handling
-    result._statusCode = response.status;
-
-    return result;
-  } catch (error) {
-    console.error(`API request error (${method} ${path}):`, error);
-    throw error;
-  }
+  await throwIfResNotOk(res);
+  return res;
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
