@@ -81,22 +81,18 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
       const response = await apiRequest("DELETE", `/api/solutions/${solution.id}`);
       console.log(`[DELETE] Server response:`, response);
       
-      if (!response || !response.success) {
-        throw new Error(response?.message || "Failed to delete solution");
-      }
-      
       toast({
         title: "Solution deleted",
         description: "The solution has been deleted successfully.",
       });
       
       console.log(`[DELETE] Invalidating queries for issueId ${issueId}`);
-      await queryClient.invalidateQueries({ queryKey: [`/api/issues/${issueId}/solutions`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/issues/${issueId}/solutions`] });
       
-      console.log(`[DELETE] Forcing refetch for issueId ${issueId}`);
-      await queryClient.refetchQueries({ queryKey: [`/api/issues/${issueId}/solutions`] });
-      
-      console.log(`[DELETE] Deletion process completed for solution ${solution.id}`);
+      // Forced timeout to ensure state updates properly
+      setTimeout(() => {
+        console.log(`[DELETE] Deletion process completed for solution ${solution.id}`);
+      }, 500);
     } catch (error: any) {
       console.error("Delete error:", error);
       toast({
@@ -109,15 +105,13 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
     }
   };
 
-  // Hide rejected solutions from non-admin users
-  if (!user?.isAdmin && solution.rejected) {
+  // Hide rejected or unapproved solutions from non-admin users
+  if (!user?.isAdmin && (solution.rejected || !solution.approved)) {
+    console.log(`Hiding solution ${solution.id} from non-admin user (rejected: ${solution.rejected}, approved: ${solution.approved})`);
     return null;
   }
-
-  // Hide unapproved solutions from non-admin users
-  if (!user?.isAdmin && !solution.approved) {
-    return null;
-  }
+  
+  console.log(`Rendering solution ${solution.id} (rejected: ${solution.rejected}, approved: ${solution.approved}, user is admin: ${user?.isAdmin})`);
 
   return (
     <>

@@ -9,9 +9,9 @@ async function throwIfResNotOk(res: Response) {
 
 export async function apiRequest(
   method: string,
-  apiPath: string, // Added apiPath parameter
+  apiPath: string,
   data?: unknown | undefined,
-): Promise<Response> {
+): Promise<any> {
   try {
     const requestId = Math.random().toString(36).substring(2, 8); // For tracking in logs
 
@@ -41,10 +41,16 @@ export async function apiRequest(
       requestBody ? { body: JSON.parse(requestBody) } : '(no body)');
 
     const res = await fetch(normalizedPath, options);
-
+    
     await throwIfResNotOk(res);
-    return res;
+    
+    // Parse the JSON response
+    const jsonData = await res.json();
+    console.log(`[${requestId}] API response data:`, jsonData);
+    
+    return jsonData;
   } catch (error) {
+    const requestId = Math.random().toString(36).substring(2, 8);
     console.error(`[${requestId}] API request failed:`, error);
     throw error; // Re-throw the error to be handled higher up
   }
