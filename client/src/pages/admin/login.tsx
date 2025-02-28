@@ -43,11 +43,10 @@ export default function Login() {
       });
       navigate("/repository");
     } catch (error) {
-      console.error("Login failed:", error); //Improved error logging
       toast({
         variant: "destructive",
         title: "Login failed",
-        description: "Invalid username or password. Please check your credentials and try again.", //More informative error message.
+        description: "Invalid username or password",
       });
     }
   }

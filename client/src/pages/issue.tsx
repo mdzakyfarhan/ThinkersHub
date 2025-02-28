@@ -18,20 +18,14 @@ export default function IssuePage() {
     queryKey: [`/api/issues/${id}`],
   });
 
-  const { data: solutions, isLoading: isLoadingSolutions, isError, error } = useQuery<Solution[]>({
+  const { data: solutions, isLoading: isLoadingSolutions } = useQuery<Solution[]>({
     queryKey: [`/api/issues/${id}/solutions`],
     queryFn: async () => {
       console.log(`[FETCH] Fetching solutions for issue ${id}`);
-      try {
-        const result = await apiRequest("GET", `/api/issues/${id}/solutions`);
-        console.log(`[FETCH] Received ${result?.length || 0} solutions:`, result);
-        return result || [];
-      } catch (err) {
-        console.error('[FETCH] Error fetching solutions:', err);
-        return [];
-      }
+      const result = await apiRequest("GET", `/api/issues/${id}/solutions`);
+      console.log(`[FETCH] Received ${result?.length || 0} solutions:`, result);
+      return result;
     },
-    refetchOnWindowFocus: true,
     enabled: !!id,
   });
 
@@ -99,20 +93,14 @@ export default function IssuePage() {
           </div>
 
           <div className="space-y-4">
-            {isError && (
-              <p className="text-center text-red-500 py-8">
-                Error loading solutions. Please refresh the page.
-              </p>
-            )}
-            {!isError && solutions && solutions.length > 0 ? (
-              solutions.map((solution) => (
-                <SolutionCard 
-                  key={solution.id} 
-                  solution={solution} 
-                  issueId={Number(id)}
-                />
-              ))
-            ) : (
+            {solutions?.map((solution) => (
+              <SolutionCard 
+                key={solution.id} 
+                solution={solution} 
+                issueId={Number(id)}
+              />
+            ))}
+            {solutions?.length === 0 && (
               <p className="text-center text-muted-foreground py-8">
                 No solutions have been proposed yet. Be the first to add a solution!
               </p>

@@ -9,53 +9,42 @@ async function throwIfResNotOk(res: Response) {
 
 export async function apiRequest(
   method: string,
-  apiPath: string,
+  apiPath: string, // Added apiPath parameter
   data?: unknown | undefined,
-): Promise<any> {
+): Promise<Response> {
   try {
     const requestId = Math.random().toString(36).substring(2, 8); // For tracking in logs
 
-    // Normalize the path to ensure it starts with /api
-    const normalizedPath = apiPath.startsWith("/api") 
-      ? apiPath 
-      : `/api${apiPath}`;
-
-    console.log(`[${requestId}] API request: ${method} ${normalizedPath}`, data ? { body: data } : '');
-
-    const requestBody = data ? JSON.stringify(data) : undefined;
+    // Combine body and data into a single payload
+    const payload = data;
+    const requestBody = payload && method !== "GET" && method !== "HEAD"
+      ? JSON.stringify(payload)
+      : undefined;
 
     const options: RequestInit = {
       method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include", // Important for cookies/auth
-      body: requestBody,
+      headers: payload && method !== "GET" && method !== "HEAD"
+        ? { "Content-Type": "application/json" }
+        : {},
+      credentials: "include",
     };
 
-    console.log(`[${requestId}] Request options:`, 
+    // Only add body for non-GET/HEAD requests
+    if (requestBody) {
+      options.body = requestBody;
+    }
+
+    // Always ensure path starts with / for consistency
+    const normalizedPath = apiPath.startsWith("/") ? apiPath : `/${apiPath}`;
+
+    console.log(`[${requestId}] API request: ${method} ${normalizedPath}`,
       requestBody ? { body: JSON.parse(requestBody) } : '(no body)');
 
     const res = await fetch(normalizedPath, options);
 
     await throwIfResNotOk(res);
-
-    // Check if the response has content before trying to parse JSON
-    const contentType = res.headers.get("content-type");
-    if (contentType && contentType.includes("application/json")) {
-      try {
-        const jsonData = await res.json();
-        console.log(`[${requestId}] API response data:`, jsonData);
-        return jsonData;
-      } catch (e) {
-        console.log(`[${requestId}] Failed to parse JSON response:`, e);
-        return res;
-      }
-    }
-
     return res;
   } catch (error) {
-    const requestId = Math.random().toString(36).substring(2, 8);
     console.error(`[${requestId}] API request failed:`, error);
     throw error; // Re-throw the error to be handled higher up
   }
