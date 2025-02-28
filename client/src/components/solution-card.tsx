@@ -1,3 +1,4 @@
+
 import { Solution } from "@shared/schema";
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -75,45 +76,26 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
 
   const handleDelete = async () => {
     try {
-      console.log(`Attempting to delete solution ${solution.id}`);
-
-      const result = await apiRequest("DELETE", `/api/solutions/${solution.id}`);
-      console.log(`Delete solution response:`, result);
-      
-      if (!result.success) {
-        throw new Error(result.message || "Failed to delete solution");
+      const response = await apiRequest("DELETE", `/api/solutions/${solution.id}`);
+      if (!response || !response.success) {
+        throw new Error(response?.message || "Failed to delete solution");
       }
-
       toast({
         title: "Solution deleted",
         description: "The solution has been deleted successfully.",
       });
-
-      // Use a direct API request to get fresh data after deletion
-      console.log(`Directly fetching updated solutions for issue ${issueId}`);
-      try {
-        const freshData = await apiRequest("GET", `/api/issues/${issueId}/solutions`);
-        console.log("Fresh solution data after deletion:", freshData);
-        
-        // Force update the query cache with the fresh data
-        queryClient.setQueryData([`/api/issues/${issueId}/solutions`], freshData);
-        
-        // After setting the cache, also invalidate to ensure consistency
-        await queryClient.invalidateQueries({
-          queryKey: [`/api/issues/${issueId}/solutions`]
-        });
-      } catch (fetchError) {
-        console.error("Error fetching fresh data after deletion:", fetchError);
-      }
-    } catch (error) {
-      console.error(`Error deleting solution ${solution.id}:`, error);
+      await queryClient.invalidateQueries({ queryKey: [`/api/issues/${issueId}/solutions`] });
+      await queryClient.refetchQueries({ queryKey: [`/api/issues/${issueId}/solutions`] });
+    } catch (error: any) {
+      console.error("Delete error:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to delete solution.",
+        description: error.message || "Failed to delete solution. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setShowDeleteDialog(false);
     }
-    setShowDeleteDialog(false);
   };
 
   // Hide rejected solutions from non-admin users
@@ -166,9 +148,9 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
                 Reject
               </Button>
             )}
-            <Button onClick={() => setShowDeleteDialog(true)} size="sm" variant="outline" className="text-red-600">
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete
+          <Button onClick={() => setShowDeleteDialog(true)} size="sm" variant="outline" className="text-red-600">
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete
             </Button>
           </CardFooter>
         )}
