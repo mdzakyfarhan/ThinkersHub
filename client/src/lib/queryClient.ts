@@ -20,7 +20,10 @@ export async function apiRequest(
       credentials: "include",
     };
 
-    const response = await fetch(`/api${path}`, options);
+    // Check if path already starts with /api to avoid doubling it
+    const apiPath = path.startsWith("/api") ? path : `/api${path}`;
+    
+    const response = await fetch(apiPath, options);
     const result = await response.json();
 
     // Attach status code to the result to help with client-side handling
