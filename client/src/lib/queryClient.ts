@@ -13,18 +13,28 @@ export async function apiRequest(
   data?: unknown | undefined,
 ): Promise<{ _statusCode: number } & any> {
   try {
+    const body = data ? JSON.stringify(data) : undefined;
+
     const options: RequestInit = {
       method,
+      body,
       headers: data ? { "Content-Type": "application/json" } : {},
-      body: data ? JSON.stringify(data) : undefined,
       credentials: "include",
     };
 
-    // Check if path already starts with /api to avoid doubling it
-    const apiPath = path.startsWith("/api") ? path : `/api${path}`;
-    
+    // Always ensure path starts with / for consistency
+    const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+
+    // All API requests should go to /api/* endpoint
+    const apiPath = normalizedPath.startsWith("/api") ? normalizedPath : `/api${normalizedPath}`;
+
+    console.log(`API request: ${method} ${apiPath}`);
+
     const response = await fetch(apiPath, options);
+    console.log(`API response status: ${response.status}`);
+
     const result = await response.json();
+    console.log("API response body:", result);
 
     // Attach status code to the result to help with client-side handling
     result._statusCode = response.status;
