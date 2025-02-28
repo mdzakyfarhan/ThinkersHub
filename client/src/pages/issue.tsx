@@ -20,18 +20,6 @@ export default function IssuePage() {
 
   const { data: solutions, isLoading: isLoadingSolutions } = useQuery<Solution[]>({
     queryKey: [`/api/issues/${id}/solutions`],
-    queryFn: async () => {
-      try {
-        console.log(`[FETCH] Fetching solutions for issue ${id}`);
-        const result = await apiRequest("GET", `/api/issues/${id}/solutions`);
-        console.log(`[FETCH] Received ${result?.length || 0} solutions:`, result);
-        return result || [];
-      } catch (error) {
-        console.error(`[FETCH] Error fetching solutions:`, error);
-        return [];
-      }
-    },
-    enabled: !!id,
   });
 
   if (isLoadingIssue || isLoadingSolutions) {
