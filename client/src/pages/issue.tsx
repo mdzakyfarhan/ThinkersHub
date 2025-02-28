@@ -18,14 +18,20 @@ export default function IssuePage() {
     queryKey: [`/api/issues/${id}`],
   });
 
-  const { data: solutions, isLoading: isLoadingSolutions } = useQuery<Solution[]>({
+  const { 
+    data: solutions, 
+    isLoading: isLoadingSolutions,
+    refetch: refetchSolutions
+  } = useQuery<Solution[]>({
     queryKey: [`/api/issues/${id}/solutions`],
     onSuccess: (data) => {
       console.log(`Solutions query succeeded with ${data?.length} solutions:`, data);
     },
     onError: (error) => {
       console.error(`Solutions query failed:`, error);
-    }
+    },
+    refetchOnWindowFocus: true,
+    staleTime: 3000 // Consider data stale after 3 seconds
   });
 
   if (isLoadingIssue || isLoadingSolutions) {
@@ -85,7 +91,10 @@ export default function IssuePage() {
                 </DialogHeader>
                 <CreateSolutionForm 
                   issueId={Number(id)} 
-                  onSuccess={() => setIsDialogOpen(false)} 
+                  onSuccess={() => {
+                    setIsDialogOpen(false);
+                    refetchSolutions(); //Added refetch call here
+                  }} 
                 />
               </DialogContent>
             </Dialog>
@@ -97,6 +106,7 @@ export default function IssuePage() {
                 key={solution.id} 
                 solution={solution} 
                 issueId={Number(id)}
+                onSolutionDelete={refetchSolutions} //Added prop for refetch
               />
             ))}
             {solutions?.length === 0 && (

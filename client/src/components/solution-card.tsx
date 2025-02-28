@@ -79,28 +79,37 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
 
       const result = await apiRequest("DELETE", `/api/solutions/${solution.id}`);
       console.log(`Delete solution response:`, result);
+      
+      if (!result.success) {
+        throw new Error(result.message || "Failed to delete solution");
+      }
 
       toast({
         title: "Solution deleted",
         description: "The solution has been deleted successfully.",
       });
 
-      console.log(`Invalidating query: /api/issues/${issueId}/solutions`);
-      await queryClient.invalidateQueries({ 
-        queryKey: [`/api/issues/${issueId}/solutions`] 
-      });
-      console.log(`Query invalidated, cache should be refreshed`);
-
-      // Force refetch to validate cache refresh
-      const updatedSolutions = await queryClient.fetchQuery({
-        queryKey: [`/api/issues/${issueId}/solutions`]
-      });
-      console.log(`Refetched solutions after deletion:`, updatedSolutions);
+      // Use a direct API request to get fresh data after deletion
+      console.log(`Directly fetching updated solutions for issue ${issueId}`);
+      try {
+        const freshData = await apiRequest("GET", `/api/issues/${issueId}/solutions`);
+        console.log("Fresh solution data after deletion:", freshData);
+        
+        // Force update the query cache with the fresh data
+        queryClient.setQueryData([`/api/issues/${issueId}/solutions`], freshData);
+        
+        // After setting the cache, also invalidate to ensure consistency
+        await queryClient.invalidateQueries({
+          queryKey: [`/api/issues/${issueId}/solutions`]
+        });
+      } catch (fetchError) {
+        console.error("Error fetching fresh data after deletion:", fetchError);
+      }
     } catch (error) {
       console.error(`Error deleting solution ${solution.id}:`, error);
       toast({
         title: "Error",
-        description: "Failed to delete solution.",
+        description: error instanceof Error ? error.message : "Failed to delete solution.",
         variant: "destructive",
       });
     }
