@@ -9,18 +9,45 @@ async function throwIfResNotOk(res: Response) {
 
 export async function apiRequest(
   method: string,
-  url: string,
+  apiPath: string, // Added apiPath parameter
   data?: unknown | undefined,
 ): Promise<Response> {
-  const res = await fetch(url, {
-    method,
-    headers: data ? { "Content-Type": "application/json" } : {},
-    body: data ? JSON.stringify(data) : undefined,
-    credentials: "include",
-  });
+  try {
+    const requestId = Math.random().toString(36).substring(2, 8); // For tracking in logs
 
-  await throwIfResNotOk(res);
-  return res;
+    // Combine body and data into a single payload
+    const payload = data;
+    const requestBody = payload && method !== "GET" && method !== "HEAD"
+      ? JSON.stringify(payload)
+      : undefined;
+
+    const options: RequestInit = {
+      method,
+      headers: payload && method !== "GET" && method !== "HEAD"
+        ? { "Content-Type": "application/json" }
+        : {},
+      credentials: "include",
+    };
+
+    // Only add body for non-GET/HEAD requests
+    if (requestBody) {
+      options.body = requestBody;
+    }
+
+    // Always ensure path starts with / for consistency
+    const normalizedPath = apiPath.startsWith("/") ? apiPath : `/${apiPath}`;
+
+    console.log(`[${requestId}] API request: ${method} ${normalizedPath}`,
+      requestBody ? { body: JSON.parse(requestBody) } : '(no body)');
+
+    const res = await fetch(normalizedPath, options);
+
+    await throwIfResNotOk(res);
+    return res;
+  } catch (error) {
+    console.error(`[${requestId}] API request failed:`, error);
+    throw error; // Re-throw the error to be handled higher up
+  }
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";

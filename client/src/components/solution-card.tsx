@@ -76,16 +76,27 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
 
   const handleDelete = async () => {
     try {
+      console.log(`[DELETE] Starting deletion of solution ${solution.id}`);
+      
       const response = await apiRequest("DELETE", `/api/solutions/${solution.id}`);
+      console.log(`[DELETE] Server response:`, response);
+      
       if (!response || !response.success) {
         throw new Error(response?.message || "Failed to delete solution");
       }
+      
       toast({
         title: "Solution deleted",
         description: "The solution has been deleted successfully.",
       });
+      
+      console.log(`[DELETE] Invalidating queries for issueId ${issueId}`);
       await queryClient.invalidateQueries({ queryKey: [`/api/issues/${issueId}/solutions`] });
+      
+      console.log(`[DELETE] Forcing refetch for issueId ${issueId}`);
       await queryClient.refetchQueries({ queryKey: [`/api/issues/${issueId}/solutions`] });
+      
+      console.log(`[DELETE] Deletion process completed for solution ${solution.id}`);
     } catch (error: any) {
       console.error("Delete error:", error);
       toast({
