@@ -143,25 +143,38 @@ export async function registerRoutes(app: Express) {
 
   app.delete("/api/solutions/:id", async (req, res) => {
     try {
+      console.log("DELETE REQUEST: Received delete request for solution");
       const id = Number(req.params.id);
+      console.log(`DELETE PARAM: Solution ID from parameters: ${req.params.id}, parsed as number: ${id}`);
+      
       if (isNaN(id)) {
+        console.log("DELETE ERROR: Invalid solution ID (not a number)");
         return res.status(400).json({ success: false, message: "Invalid solution ID" });
       }
       
       // First check if solution exists
-      const solution = await storage.getSolutions(id);
-      if (!solution || solution.length === 0) {
+      console.log(`DELETE CHECK: Checking if solution ${id} exists`);
+      const solutions = await storage.getSolutions(id);
+      console.log(`DELETE CHECK RESULT: Solutions retrieved:`, solutions);
+      
+      if (!solutions || solutions.length === 0) {
+        console.log(`DELETE ERROR: Solution ${id} not found in getSolutions call`);
         return res.status(404).json({ success: false, message: `Solution ${id} not found` });
       }
 
+      console.log(`DELETE PROCEED: Solution ${id} found, proceeding with deletion`);
       const result = await storage.deleteSolution(id);
+      console.log(`DELETE RESULT: Deletion result:`, result);
+      
       if (!result.success) {
+        console.log(`DELETE ERROR: Deletion failed with message: ${result.message}`);
         return res.status(400).json({ success: false, message: result.message });
       }
       
+      console.log(`DELETE SUCCESS: Solution ${id} deleted successfully`);
       res.json({ success: true, message: "Solution deleted successfully" });
     } catch (error: any) {
-      console.error("Delete error:", error);
+      console.error("DELETE ERROR: Exception during deletion:", error);
       res.status(500).json({ 
         success: false, 
         message: error.message || "Internal server error during solution deletion"

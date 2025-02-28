@@ -24,6 +24,8 @@ export interface IStorage {
   getSolutions(issueId: number): Promise<Solution[]>;
   createSolution(solution: InsertSolution): Promise<Solution>;
   approveSolution(id: number): Promise<Solution>;
+  rejectSolution(id: number): Promise<Solution>;
+  deleteSolution(id: number): Promise<{ success: boolean; message?: string }>;
 }
 
 export class MemStorage implements IStorage {
@@ -123,9 +125,13 @@ export class MemStorage implements IStorage {
 
   // Solutions
   async getSolutions(issueId: number): Promise<Solution[]> {
-    return Array.from(this.solutions.values()).filter(
-      s => s.issueId === issueId
-    );
+    console.log(`GET SOLUTIONS: Fetching solutions for issueId ${issueId}`);
+    console.log(`GET SOLUTIONS DEBUG: All solutions in storage:`, Array.from(this.solutions.entries()));
+
+    const filtered = Array.from(this.solutions.values()).filter(s => s.issueId === issueId);
+    console.log(`GET SOLUTIONS RESULT: Found ${filtered.length} solutions for issueId ${issueId}:`, filtered);
+
+    return filtered;
   }
 
   async createSolution(solution: InsertSolution): Promise<Solution> {
@@ -174,7 +180,7 @@ export class MemStorage implements IStorage {
       console.log(`Solution ${id} not found for deletion`);
       return { success: false, message: `Solution ${id} not found` };
     }
-    
+
     try {
       const deleted = this.solutions.delete(id);
       console.log(`Solution ${id} deletion result:`, deleted);
