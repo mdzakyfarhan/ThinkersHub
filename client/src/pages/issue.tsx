@@ -20,6 +20,12 @@ export default function IssuePage() {
 
   const { data: solutions, isLoading: isLoadingSolutions } = useQuery<Solution[]>({
     queryKey: [`/api/issues/${id}/solutions`],
+    onSuccess: (data) => {
+      console.log(`Solutions query succeeded with ${data?.length} solutions:`, data);
+    },
+    onError: (error) => {
+      console.error(`Solutions query failed:`, error);
+    }
   });
 
   if (isLoadingIssue || isLoadingSolutions) {

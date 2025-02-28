@@ -1,4 +1,3 @@
-
 import { Solution } from "@shared/schema";
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -76,26 +75,36 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
 
   const handleDelete = async () => {
     try {
-      const response = await apiRequest("DELETE", `/api/solutions/${solution.id}`);
-      if (!response || !response.success) {
-        throw new Error(response?.message || "Failed to delete solution");
-      }
+      console.log(`Attempting to delete solution ${solution.id}`);
+
+      const result = await apiRequest("DELETE", `/api/solutions/${solution.id}`);
+      console.log(`Delete solution response:`, result);
+
       toast({
         title: "Solution deleted",
         description: "The solution has been deleted successfully.",
       });
-      await queryClient.invalidateQueries({ queryKey: [`/api/issues/${issueId}/solutions`] });
-      await queryClient.refetchQueries({ queryKey: [`/api/issues/${issueId}/solutions`] });
-    } catch (error: any) {
-      console.error("Delete error:", error);
+
+      console.log(`Invalidating query: /api/issues/${issueId}/solutions`);
+      await queryClient.invalidateQueries({ 
+        queryKey: [`/api/issues/${issueId}/solutions`] 
+      });
+      console.log(`Query invalidated, cache should be refreshed`);
+
+      // Force refetch to validate cache refresh
+      const updatedSolutions = await queryClient.fetchQuery({
+        queryKey: [`/api/issues/${issueId}/solutions`]
+      });
+      console.log(`Refetched solutions after deletion:`, updatedSolutions);
+    } catch (error) {
+      console.error(`Error deleting solution ${solution.id}:`, error);
       toast({
         title: "Error",
-        description: error.message || "Failed to delete solution. Please try again.",
+        description: "Failed to delete solution.",
         variant: "destructive",
       });
-    } finally {
-      setShowDeleteDialog(false);
     }
+    setShowDeleteDialog(false);
   };
 
   // Hide rejected solutions from non-admin users
@@ -148,9 +157,9 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
                 Reject
               </Button>
             )}
-          <Button onClick={() => setShowDeleteDialog(true)} size="sm" variant="outline" className="text-red-600">
-            <Trash2 className="h-4 w-4 mr-2" />
-            Delete
+            <Button onClick={() => setShowDeleteDialog(true)} size="sm" variant="outline" className="text-red-600">
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete
             </Button>
           </CardFooter>
         )}
