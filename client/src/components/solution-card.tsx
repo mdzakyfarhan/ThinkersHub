@@ -109,15 +109,19 @@ export function SolutionCard({ solution, issueId }: SolutionCardProps) {
     }
   };
 
-  // Hide rejected solutions from non-admin users
-  if (!user?.isAdmin && solution.rejected) {
-    return null;
+  // Only hide solutions based on status for non-admin users
+  // For admin users, always show all solutions
+  if (!user?.isAdmin) {
+    if (solution.rejected) {
+      return null;
+    }
+    
+    if (!solution.approved) {
+      return null;
+    }
   }
-
-  // Hide unapproved solutions from non-admin users
-  if (!user?.isAdmin && !solution.approved) {
-    return null;
-  }
+  
+  console.log(`[RENDER] Rendering solution card ${solution.id} with status: approved=${solution.approved}, rejected=${solution.rejected}`);
 
   return (
     <>

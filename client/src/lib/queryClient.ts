@@ -34,8 +34,12 @@ export async function apiRequest(
       options.body = requestBody;
     }
 
-    // Always ensure path starts with / for consistency
-    const normalizedPath = apiPath.startsWith("/") ? apiPath : `/${apiPath}`;
+    // Normalize the path to ensure it's correctly formatted
+    let normalizedPath = apiPath;
+    if (!normalizedPath.startsWith("/")) {
+      normalizedPath = `/${normalizedPath}`;
+    }
+    console.log(`[REQUEST] Using normalized path: ${normalizedPath}`);
 
     console.log(`[${requestId}] API request: ${method} ${normalizedPath}`,
       requestBody ? { body: JSON.parse(requestBody) } : '(no body)');
